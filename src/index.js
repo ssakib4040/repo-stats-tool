@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const ora = require("ora-classic");
+const chalk = require("chalk"); // Added for color styling
 
 // Function to read the content of a file
 const readFile = (filePath) => {
@@ -29,11 +30,12 @@ const traverseDirectory = async (
   dir,
   excludeFolders,
   excludeExtensions,
-  spinner
+  spinner,
+  totalFiles
 ) => {
   let totalLines = 0;
   let totalWords = 0;
-  let totalFiles = 0;
+  let currentFileCount = 0;
 
   const files = await fs.promises.readdir(dir, { withFileTypes: true });
 
@@ -46,11 +48,12 @@ const traverseDirectory = async (
           filePath,
           excludeFolders,
           excludeExtensions,
-          spinner
+          spinner,
+          totalFiles
         );
         totalLines += lines;
         totalWords += words;
-        totalFiles += filesCount;
+        currentFileCount += filesCount;
       }
     } else {
       const fileExtension = path.extname(file.name);
@@ -59,15 +62,17 @@ const traverseDirectory = async (
         const { lines, words } = countLinesAndWords(data);
         totalLines += lines;
         totalWords += words;
-        totalFiles += 1;
+        currentFileCount += 1;
 
-        // Update spinner text
-        spinner.text = `Processing files... (${totalFiles}/${files.length})`;
+        // Update spinner text only when totalFiles is available
+        if (totalFiles) {
+          spinner.text = `Processing files... (${currentFileCount}/${totalFiles})`;
+        }
       }
     }
   }
 
-  return { lines: totalLines, words: totalWords, filesCount: totalFiles };
+  return { lines: totalLines, words: totalWords, filesCount: currentFileCount };
 };
 
 // Function to count total files for progress indication
@@ -93,7 +98,7 @@ const countFiles = async (dir, excludeFolders, excludeExtensions) => {
 const main = async () => {
   const repoPath = process.cwd(); // Use the current working directory
   const excludeFolders = ["node_modules", ".git"]; // Specify folders to exclude here
-  const excludeExtensions = []; // Specify file extensions to exclude here
+  const excludeExtensions = [".cs", ".py"]; // Specify file extensions to exclude here
 
   try {
     // Initialize spinner
@@ -116,13 +121,14 @@ const main = async () => {
     );
 
     // Stop spinner
-    spinner.succeed("Processing complete.");
+    spinner.succeed(chalk.green("Processing complete."));
 
-    console.log(`Total lines: ${lines}`);
-    console.log(`Total words: ${words}`);
-    console.log(`Total files: ${filesCount}`);
+    // Display results with styling
+    console.log(chalk.cyan.bold("Total lines:"), lines);
+    console.log(chalk.cyan.bold("Total words:"), words);
+    console.log(chalk.cyan.bold("Total files:"), filesCount);
   } catch (err) {
-    console.error("Error:", err);
+    console.error(chalk.red("Error:"), err);
   }
 };
 
