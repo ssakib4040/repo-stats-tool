@@ -1,0 +1,12 @@
+{
+  "name": "repo-stats-tool",
+  "version": "1.1.0",
+  "main": "src/index.js",
+  "bin": {
+    "repo-stats-tool": "./src/index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ora-classic": "^5.4.2"
+  }
+}
