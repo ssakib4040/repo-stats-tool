@@ -98,7 +98,7 @@ const countFiles = async (dir, excludeFolders, excludeExtensions) => {
 const main = async () => {
   const repoPath = process.cwd(); // Use the current working directory
   const excludeFolders = ["node_modules", ".git"]; // Specify folders to exclude here
-  const excludeExtensions = [".cs", ".py"]; // Specify file extensions to exclude here
+  const excludeExtensions = []; // Specify file extensions to exclude here
 
   try {
     // Initialize spinner
